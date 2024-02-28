@@ -7,10 +7,15 @@
 
 #include <SFML/Graphics.hpp>
 #include "../OVTVector/OVTVector.h"
+#include "../OVTRigidBody/OVTRigidBody.h"
 
 class Game {
 private:
     sf::RenderWindow m_window;
+
+    std::vector<OVTRigidBody> m_bodies;
+
+    void init();
 
     void input();
     void update();

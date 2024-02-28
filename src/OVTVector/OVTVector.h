@@ -22,6 +22,8 @@ public:
 
     OVTVector &operator+=(const OVTVector &that);
     OVTVector &operator-=(const OVTVector &that);
+
+    static OVTVector zero();
 };
 
 

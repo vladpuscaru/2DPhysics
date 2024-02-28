@@ -50,3 +50,7 @@ OVTVector::OVTVector()
 {
 
 }
+
+OVTVector OVTVector::zero() {
+    return { 0.0f, 0.0f };
+}
