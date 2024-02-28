@@ -7,7 +7,9 @@ set(SOURCE_FILES src/main.cpp
         src/OVTVector/OVTVector.cpp
         src/OVTVector/OVTVector.h
         src/Game/Game.cpp
-        src/Game/Game.h)
+        src/Game/Game.h
+        src/OVTMath/OVTMath.cpp
+        src/OVTMath/OVTMath.h)
 add_executable(physics_engine ${SOURCE_FILES})
 
 find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)

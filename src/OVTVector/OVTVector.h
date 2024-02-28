@@ -11,12 +11,14 @@ public:
     float x;
     float y;
 
+    OVTVector();
     OVTVector(float x, float y);
     OVTVector operator-() const;
     OVTVector operator+(const OVTVector &that) const;
     OVTVector operator-(const OVTVector &that) const;
     OVTVector operator*(float scalar) const;
     OVTVector operator/(float scalar) const;
+    bool operator==(const OVTVector &that) const;
 
     OVTVector &operator+=(const OVTVector &that);
     OVTVector &operator-=(const OVTVector &that);

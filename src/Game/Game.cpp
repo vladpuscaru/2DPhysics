@@ -38,6 +38,5 @@ void Game::render() {
     m_window.clear(sf::Color::Blue);
 
 
-
     m_window.display();
 }

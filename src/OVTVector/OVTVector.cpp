@@ -24,7 +24,7 @@ OVTVector &OVTVector::operator+=(const OVTVector &that) {
 }
 
 OVTVector OVTVector::operator-(const OVTVector &that) const {
-    return *this + (-that)
+    return *this + (-that);
 }
 
 OVTVector OVTVector::operator-() const {
@@ -39,4 +39,14 @@ OVTVector &OVTVector::operator-=(const OVTVector &that) {
 
 OVTVector OVTVector::operator/(float scalar) const {
     return *this * (1 / scalar);
+}
+
+bool OVTVector::operator==(const OVTVector &that) const {
+    return this->x == that.x && this->y == that.y;
+}
+
+OVTVector::OVTVector()
+    : x(0), y(0)
+{
+
 }

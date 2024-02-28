@@ -6,6 +6,7 @@
 #define PHYSICS_ENGINE_GAME_H
 
 #include <SFML/Graphics.hpp>
+#include "../OVTVector/OVTVector.h"
 
 class Game {
 private:
