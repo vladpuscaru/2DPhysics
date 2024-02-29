@@ -25,6 +25,7 @@ private:
 
     static VerticesProjectionManifold projectVertices(const std::vector<OVTVector>& vertices, const OVTVector& axis);
 
+    static OVTVector findArithmeticMean(const std::vector<OVTVector>& vertices);
 public:
     static CollisionManifold
     intersectCircle(const OVTVector &centerA, float radiusA, const OVTVector &centerB, float radiusB);

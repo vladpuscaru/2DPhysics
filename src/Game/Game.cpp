@@ -89,17 +89,19 @@ void Game::update(float deltaTime) {
             auto &bodyA = m_bodies[i];
             auto &bodyB = m_bodies[j];
 
+            CollisionManifold collision;
+            collision.isCollision = false;
+
             if (bodyA.m_shape == ShapeType::Circle && bodyB.m_shape == ShapeType::Circle) {
-                auto collision = OVTCollisions::intersectCircle(bodyA.m_position, bodyA.m_radius, bodyB.m_position, bodyB.m_radius);
-                if (collision.isCollision) {
-                    bodyA.move(-collision.normal * collision.depth / 2.f);
-                    bodyB.move(collision.normal * collision.depth / 2.f);
-                }
+                collision = OVTCollisions::intersectCircle(bodyA.m_position, bodyA.m_radius, bodyB.m_position, bodyB.m_radius);
             } else {
-                auto collision = OVTCollisions::intersectPolygons(bodyA.getTransformedVertices(), bodyB.getTransformedVertices());
-                if (collision.isCollision) {
-                    std::cout << "Collision" << std::endl;
-                }
+                collision = OVTCollisions::intersectPolygons(bodyA.getTransformedVertices(), bodyB.getTransformedVertices());
+            }
+
+            if (collision.isCollision) {
+                std::cout << "Collision" << std::endl;
+                bodyA.move(-collision.normal * collision.depth / 2.f);
+                bodyB.move(collision.normal * collision.depth / 2.f);
             }
         }
     }
@@ -107,7 +109,7 @@ void Game::update(float deltaTime) {
     int countCircles = 0;
     int countRects = 0;
     for (auto &body: m_bodies) {
-        body.rotate(-M_PI / 2.f * deltaTime);
+//        body.rotate(-M_PI / 2.f * deltaTime);
         if (body.m_shape == ShapeType::Circle) {
             m_circles[countCircles].setPosition({body.m_position.x, body.m_position.y});
             m_circles[countCircles].setRotation(body.m_rotationAngle);

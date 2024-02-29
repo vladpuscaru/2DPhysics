@@ -30,7 +30,7 @@ OVTCollisions::intersectCircle(const OVTVector &centerA, float radiusA, const OV
 }
 
 /**
- * Separate-Axis Collision Detection
+ * Separating Axis Theorem for Collision Detection
  * @param verticesA
  * @param verticesB
  * @return
@@ -59,6 +59,20 @@ OVTCollisions::intersectPolygons(const std::vector<OVTVector> &verticesA, const 
             manifold.isCollision = false;
             break;
         }
+
+        // There is intersection when projecting on this axis, continue checking
+        if (i == 0) {
+            manifold.normal = axis;
+            manifold.depth = std::min<float>(projectionManifoldA.max - projectionManifoldB.min,
+                                             projectionManifoldB.max - projectionManifoldA.min);
+        } else {
+            float newDepth = std::min<float>(projectionManifoldA.max - projectionManifoldB.min,
+                                             projectionManifoldB.max - projectionManifoldA.min);
+            if (newDepth < manifold.depth) {
+                manifold.normal = axis;
+                manifold.depth = newDepth;
+            }
+        }
     }
 
     for (int i = 0; i < verticesB.size(); i++) {
@@ -78,6 +92,26 @@ OVTCollisions::intersectPolygons(const std::vector<OVTVector> &verticesA, const 
             manifold.isCollision = false;
             break;
         }
+
+        float newDepth = std::min<float>(projectionManifoldA.max - projectionManifoldB.min,
+                                         projectionManifoldB.max - projectionManifoldA.min);
+        if (newDepth < manifold.depth) {
+            manifold.normal = axis;
+            manifold.depth = newDepth;
+        }
+    }
+
+    manifold.depth /= OVTMath::length(manifold.normal);
+    manifold.normal = OVTMath::normalize(manifold.normal);
+
+    OVTVector centerA = findArithmeticMean(verticesA);
+    OVTVector centerB = findArithmeticMean(verticesB);
+
+    OVTVector directionOfNormal = centerB - centerA;
+
+    if (OVTMath::dot(directionOfNormal, manifold.normal) < 0.f) {
+        // Pointing in separate direction, need to modify the normal
+        manifold.normal = -manifold.normal;
     }
 
     return manifold;
@@ -106,4 +140,16 @@ OVTCollisions::projectVertices(const std::vector<OVTVector> &vertices, const OVT
     }
 
     return manifold;
+}
+
+OVTVector OVTCollisions::findArithmeticMean(const std::vector<OVTVector> &vertices) {
+    float sumX = 0.f;
+    float sumY = 0.f;
+
+    for (const auto &vertex: vertices) {
+        sumX += vertex.x;
+        sumY += vertex.y;
+    }
+
+    return {sumX / (float)vertices.size(), sumY / (float)vertices.size()};
 }
