@@ -95,6 +95,11 @@ void Game::update(float deltaTime) {
                     bodyA.move(-collision.normal * collision.depth / 2.f);
                     bodyB.move(collision.normal * collision.depth / 2.f);
                 }
+            } else {
+                auto collision = OVTCollisions::intersectPolygons(bodyA.getTransformedVertices(), bodyB.getTransformedVertices());
+                if (collision.isCollision) {
+                    std::cout << "Collision" << std::endl;
+                }
             }
         }
     }
@@ -116,7 +121,7 @@ void Game::update(float deltaTime) {
 }
 
 void Game::render() {
-    m_window.clear({242, 232, 208});
+    m_window.clear({84, 83, 82});
 
     for (auto &circle: m_circles) {
         m_window.draw(circle);
@@ -137,7 +142,7 @@ void Game::generateRandomBodies() {
     m_bodies.clear();
     m_rects.clear();
     m_circles.clear();
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 2; i++) {
         bool isCircle = !(std::rand() % 1 == 0);
         if (isCircle) {
             float radius = 15.5f;
@@ -154,7 +159,7 @@ void Game::generateRandomBodies() {
             circle.setPosition({body.m_position.x - body.m_radius, body.m_position.y - body.m_radius});
             circle.setFillColor(getRandomColor());
             circle.setOutlineColor(sf::Color::White);
-            circle.setOutlineThickness(.2f);
+//            circle.setOutlineThickness(.2f);
             m_circles.emplace_back(circle);
         } else {
             float width = 55.5f;
@@ -169,7 +174,7 @@ void Game::generateRandomBodies() {
             rect.setPosition({body.m_position.x - body.m_width / 2, body.m_position.y - body.m_height / 2});
             rect.setFillColor(getRandomColor());
             rect.setOutlineColor(sf::Color::White);
-            rect.setOutlineThickness(.2f);
+//            rect.setOutlineThickness(.2f);
             m_rects.emplace_back(rect);
         }
     }

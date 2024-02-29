@@ -125,11 +125,13 @@ void OVTRigidBody::rotate(float amount) {
 std::vector<OVTVector> OVTRigidBody::getTransformedVertices() {
     if (m_transformUpdateRequired) {
         m_transformedVertices.clear();
+
         OVTTransform transform {m_position, m_rotationAngle};
         for (auto& vertex : m_vertices) {
             OVTVector transformedVertex = OVTMath::transform(vertex, transform);
             m_transformedVertices.push_back(transformedVertex);
         }
+
         m_transformUpdateRequired = false;
     }
 
