@@ -15,7 +15,9 @@ set(SOURCE_FILES src/main.cpp
         src/OVTWorld/OVTWorld.cpp
         src/OVTWorld/OVTWorld.h
         src/OVTCollisions/OVTCollisions.cpp
-        src/OVTCollisions/OVTCollisions.h)
+        src/OVTCollisions/OVTCollisions.h
+        src/OVTTransform/OVTTransform.cpp
+        src/OVTTransform/OVTTransform.h)
 add_executable(physics_engine ${SOURCE_FILES})
 
 find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)

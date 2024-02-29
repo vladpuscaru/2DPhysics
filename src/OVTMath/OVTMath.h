@@ -6,6 +6,7 @@
 #define PHYSICS_ENGINE_OVTMATH_H
 
 #include "../OVTVector/OVTVector.h"
+#include "../OVTTransform/OVTTransform.h"
 #include <cmath>
 
 class OVTMath {
@@ -15,6 +16,8 @@ public:
     static OVTVector normalize(const OVTVector &vec);
     static float dot(const OVTVector &vecA, const OVTVector &vecB);
     static float cross(const OVTVector &vecA, const OVTVector &vecB);
+
+    static OVTVector transform(const OVTVector &vec, const OVTTransform &transform);
 };
 
 

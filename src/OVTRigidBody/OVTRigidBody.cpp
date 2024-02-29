@@ -14,6 +14,13 @@ OVTRigidBody::OVTRigidBody(const OVTVector &position, float mass, float density,
     m_rotationAngle = 0.0f;
     m_angularVelocity = 0.0f;
 
+    m_transformUpdateRequired = true;
+
+    if (m_shape == ShapeType::Square) {
+        m_vertices = computeSquareVertices();
+        m_transformedVertices = {};
+        m_triangles = computeSquareTriangles();
+    }
 }
 
 OVTRigidBody OVTRigidBody::createCircleBody(float radius, const OVTVector &position, float density, float restitution,
@@ -74,8 +81,57 @@ OVTRigidBody::createSquareBody(float width, float height, const OVTVector &posit
 
 void OVTRigidBody::move(const OVTVector &amount) {
     m_position += amount;
+    m_transformUpdateRequired = true;
 }
 
 void OVTRigidBody::moveTo(const OVTVector &position) {
     m_position = position;
+    m_transformUpdateRequired = true;
+}
+
+std::vector<OVTVector> OVTRigidBody::computeSquareVertices() const {
+    if (m_shape != ShapeType::Square)
+        return {};
+
+    // Clockwise vertices, starting from top-left
+
+    float left = -m_width / 2.f;
+    float right = left + m_width;
+    float bottom = -m_height / 2.f;
+    float top = bottom + m_height;
+
+    return {
+            OVTVector{left, top},
+            OVTVector{right, top},
+            OVTVector{right, bottom},
+            OVTVector{left, bottom},
+    };
+}
+
+std::vector<int> OVTRigidBody::computeSquareTriangles() const {
+    if (m_shape != ShapeType::Square)
+        return {};
+
+    return {
+            0, 1, 2, 0, 2, 3
+    };
+}
+
+void OVTRigidBody::rotate(float amount) {
+    m_rotationAngle += amount;
+    m_transformUpdateRequired = true;
+}
+
+std::vector<OVTVector> OVTRigidBody::getTransformedVertices() {
+    if (m_transformUpdateRequired) {
+        m_transformedVertices.clear();
+        OVTTransform transform {m_position, m_rotationAngle};
+        for (auto& vertex : m_vertices) {
+            OVTVector transformedVertex = OVTMath::transform(vertex, transform);
+            m_transformedVertices.push_back(transformedVertex);
+        }
+        m_transformUpdateRequired = false;
+    }
+
+    return m_transformedVertices;
 }

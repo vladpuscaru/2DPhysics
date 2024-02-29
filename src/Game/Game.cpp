@@ -92,7 +92,6 @@ void Game::update(float deltaTime) {
             if (bodyA.m_shape == ShapeType::Circle && bodyB.m_shape == ShapeType::Circle) {
                 auto collision = OVTCollisions::intersectCircle(bodyA.m_position, bodyA.m_radius, bodyB.m_position, bodyB.m_radius);
                 if (collision.isCollision) {
-                    std::cout << "Collision" << std::endl;
                     bodyA.move(-collision.normal * collision.depth / 2.f);
                     bodyB.move(collision.normal * collision.depth / 2.f);
                 }
@@ -103,11 +102,14 @@ void Game::update(float deltaTime) {
     int countCircles = 0;
     int countRects = 0;
     for (auto &body: m_bodies) {
+        body.rotate(-M_PI / 2.f * deltaTime);
         if (body.m_shape == ShapeType::Circle) {
             m_circles[countCircles].setPosition({body.m_position.x, body.m_position.y});
+            m_circles[countCircles].setRotation(body.m_rotationAngle);
             countCircles++;
         } else {
             m_rects[countRects].setPosition({body.m_position.x, body.m_position.y});
+            m_rects[countRects].setRotation(body.m_rotationAngle);
             countRects++;
         }
     }
@@ -136,7 +138,7 @@ void Game::generateRandomBodies() {
     m_rects.clear();
     m_circles.clear();
     for (int i = 0; i < 20; i++) {
-        bool isCircle = std::rand() % 1 == 0;
+        bool isCircle = !(std::rand() % 1 == 0);
         if (isCircle) {
             float radius = 15.5f;
             float x = std::clamp<float>(std::rand() % m_window.getSize().x, radius, m_window.getSize().x - radius * 2);
@@ -157,8 +159,8 @@ void Game::generateRandomBodies() {
         } else {
             float width = 55.5f;
             float height = 50.5f;
-            float x = std::rand() % m_window.getSize().x - width;
-            float y = std::rand() % m_window.getSize().y - height;
+            float x = std::clamp<float>(std::rand() % m_window.getSize().x, width / 2, m_window.getSize().x - width);
+            float y = std::clamp<float>(std::rand() % m_window.getSize().y, height / 2, m_window.getSize().y - height);
             auto body = OVTRigidBody::createSquareBody(width, height, {x, y}, 5, .4f, false);
             m_bodies.emplace_back(body);
 
