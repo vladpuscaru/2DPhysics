@@ -71,3 +71,11 @@ OVTRigidBody::createSquareBody(float width, float height, const OVTVector &posit
 
     return OVTRigidBody(position, mass, density, restitution, area, isFixed, 0.0f, width, height, ShapeType::Square);
 }
+
+void OVTRigidBody::move(const OVTVector &amount) {
+    m_position += amount;
+}
+
+void OVTRigidBody::moveTo(const OVTVector &position) {
+    m_position = position;
+}

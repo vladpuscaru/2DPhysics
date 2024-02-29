@@ -38,6 +38,9 @@ public:
 
     ShapeType m_shape;
 
+    void move(const OVTVector& amount);
+    void moveTo(const OVTVector& position);
+
     static OVTRigidBody createCircleBody(float radius, const OVTVector& position, float density, float restitution, bool isFixed);
     static OVTRigidBody createSquareBody(float width, float height, const OVTVector& position, float density, float restitution, bool isFixed);
 };

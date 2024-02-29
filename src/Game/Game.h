@@ -8,19 +8,31 @@
 #include <SFML/Graphics.hpp>
 #include "../OVTVector/OVTVector.h"
 #include "../OVTRigidBody/OVTRigidBody.h"
+#include "../OVTMath/OVTMath.h"
+#include "../OVTCollisions/OVTCollisions.h"
+
 
 class Game {
 private:
     sf::RenderWindow m_window;
 
     std::vector<OVTRigidBody> m_bodies;
+    std::vector<sf::CircleShape> m_circles;
+    std::vector<sf::RectangleShape> m_rects;
+
+    bool m_isMovingLeft = false;
+    bool m_isMovingRight = false;
+    bool m_isMovingUp = false;
+    bool m_isMovingDown = false;
 
     void init();
 
     void input();
-    void update();
+    void update(float deltaTime);
     void render();
 
+    void generateRandomBodies();
+    sf::Color getRandomColor() const;
 public:
     Game(int wWidth, int wHeight, const std::string &wTitle);
 
