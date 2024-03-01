@@ -18,6 +18,8 @@ enum ShapeType {
 
 class OVTRigidBody {
 private:
+    static int BODY_COUNT;
+
     std::vector<OVTVector> m_vertices;
     std::vector<int> m_triangles;
     std::vector<OVTVector> m_transformedVertices;
@@ -31,6 +33,8 @@ private:
                  float radius, float width, float height, ShapeType shape);
 
 public:
+    int m_id;
+
     OVTVector m_position;
     OVTVector m_linearVelocity;
     float m_rotationAngle;
@@ -49,6 +53,7 @@ public:
 
     ShapeType m_shape;
 
+    void step(float deltaTime);
 
     void move(const OVTVector& amount);
     void moveTo(const OVTVector& position);

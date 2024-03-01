@@ -5,10 +5,12 @@
 #include "OVTRigidBody.h"
 #include "../OVTWorld/OVTWorld.h"
 
+int OVTRigidBody::BODY_COUNT = 1;
+
 OVTRigidBody::OVTRigidBody(const OVTVector &position, float mass, float density, float restitution, float area,
                            bool isFixed,
                            float radius, float width, float height, ShapeType shape)
-        : m_position(position), m_mass(mass), m_density(density), m_restitution(restitution), m_area(area),
+        : m_id(OVTRigidBody::BODY_COUNT++), m_position(position), m_mass(mass), m_density(density), m_restitution(restitution), m_area(area),
           m_isFixed(isFixed), m_radius(radius), m_width(width), m_height(height), m_shape(shape) {
     m_linearVelocity = OVTVector::zero();
     m_rotationAngle = 0.0f;
@@ -136,4 +138,9 @@ std::vector<OVTVector> OVTRigidBody::getTransformedVertices() {
     }
 
     return m_transformedVertices;
+}
+
+void OVTRigidBody::step(float deltaTime) {
+    m_position += m_linearVelocity * deltaTime;
+    m_rotationAngle += m_angularVelocity * deltaTime;
 }

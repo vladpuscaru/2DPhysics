@@ -64,7 +64,6 @@ void Game::input() {
 }
 
 void Game::update(float deltaTime) {
-
     // Move Player
     float dx = 0;
     float dy = 0;
@@ -78,50 +77,10 @@ void Game::update(float deltaTime) {
     if (dx != 0 || dy != 0) {
         OVTVector direction = OVTMath::normalize({dx, dy});
         OVTVector velocity = direction * speed * deltaTime;
-        m_bodies[0].move(velocity);
+        m_world.getBody(0).move(velocity);
     }
 
-    // Check Collisions
-    for (int i = 0; i < m_bodies.size() - 1; i++) {
-        for (int j = i + 1; j < m_bodies.size(); j++) {
-            if (i == j) continue;
-
-            auto &bodyA = m_bodies[i];
-            auto &bodyB = m_bodies[j];
-
-            CollisionManifold collision;
-            collision.isCollision = false;
-
-            if (bodyA.m_shape == ShapeType::Circle && bodyB.m_shape == ShapeType::Circle) {
-                collision = OVTCollisions::intersectCircle(bodyA.m_position, bodyA.m_radius, bodyB.m_position, bodyB.m_radius);
-
-                if (collision.isCollision) {
-                    bodyA.move(-collision.normal * collision.depth / 2.f);
-                    bodyB.move(collision.normal * collision.depth / 2.f);
-                }
-            } else if (bodyA.m_shape == ShapeType::Square && bodyB.m_shape == ShapeType::Square) {
-                collision = OVTCollisions::intersectPolygons(bodyA.getTransformedVertices(), bodyB.getTransformedVertices());
-
-                if (collision.isCollision) {
-                    bodyA.move(-collision.normal * collision.depth / 2.f);
-                    bodyB.move(collision.normal * collision.depth / 2.f);
-                }
-            } else {
-                auto& circle = bodyA.m_shape == ShapeType::Circle ? bodyA : bodyB;
-                auto& square = bodyA.m_shape == ShapeType::Square ? bodyA : bodyB;
-                collision = OVTCollisions::intersectCirclePolygon(circle.m_position, circle.m_radius, square.getTransformedVertices());
-
-                if (collision.isCollision) {
-                    circle.move(-collision.normal * collision.depth / 2.f);
-                    square.move(collision.normal * collision.depth / 2.f);
-                }
-            }
-        }
-    }
-
-    for (auto& body : m_bodies) {
-        body.rotate(M_PI / 2 * deltaTime);
-    }
+    m_world.step(deltaTime);
 }
 
 void Game::render() {
@@ -130,8 +89,8 @@ void Game::render() {
     sf::RectangleShape rect;
     sf::CircleShape circle;
 
-    for (int i = 0; i < m_bodies.size(); i++) {
-        auto& body = m_bodies[i];
+    for (int i = 0; i < m_world.getBodyCount(); i++) {
+        auto& body = m_world.getBody(i);
         if (body.m_shape == ShapeType::Circle) {
             circle.setRadius(body.m_radius);
             circle.setOrigin({body.m_radius, body.m_radius});
@@ -139,6 +98,7 @@ void Game::render() {
             circle.setRotation(body.m_rotationAngle * 180 / M_PI); // body has it in radians, SFML needs it in angles
             circle.setFillColor(m_colors[i]);
             circle.setOutlineColor(sf::Color::White);
+            circle.setOutlineThickness(1.f);
 
             m_window.draw(circle);
         } else if (body.m_shape == ShapeType::Square) {
@@ -148,6 +108,7 @@ void Game::render() {
             rect.setRotation(body.m_rotationAngle * 180 / M_PI); // body has it in radians, SFML needs it in angles
             rect.setFillColor(m_colors[i]);
             rect.setOutlineColor(sf::Color::White);
+            rect.setOutlineThickness(1.f);
 
             m_window.draw(rect);
         }
@@ -161,22 +122,22 @@ void Game::init() {
 }
 
 void Game::generateRandomBodies() {
-    m_bodies.clear();
-    for (int i = 0; i < 20; i++) {
+    m_world.clear();
+    for (int i = 0; i < 40; i++) {
         bool isCircle = !(std::rand() % 2 == 0);
         if (isCircle) {
             float radius = 15.5f;
             float x = std::clamp<float>(std::rand() % m_window.getSize().x, radius, m_window.getSize().x - radius * 2);
             float y = std::clamp<float>(std::rand() % m_window.getSize().y, radius, m_window.getSize().y - radius * 2);
             auto body = OVTRigidBody::createCircleBody(radius, {x, y}, 3, 1, false);
-            m_bodies.emplace_back(body);
+            m_world.addBody(body);
         } else {
             float width = 55.5f;
             float height = 50.5f;
             float x = std::clamp<float>(std::rand() % m_window.getSize().x, width / 2, m_window.getSize().x - width);
             float y = std::clamp<float>(std::rand() % m_window.getSize().y, height / 2, m_window.getSize().y - height);
             auto body = OVTRigidBody::createSquareBody(width, height, {x, y}, 5, .4f, false);
-            m_bodies.emplace_back(body);
+            m_world.addBody(body);
         }
         m_colors.emplace_back(getRandomColor());
     }

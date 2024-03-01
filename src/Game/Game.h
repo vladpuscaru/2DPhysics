@@ -10,13 +10,14 @@
 #include "../OVTRigidBody/OVTRigidBody.h"
 #include "../OVTMath/OVTMath.h"
 #include "../OVTCollisions/OVTCollisions.h"
+#include "../OVTWorld/OVTWorld.h"
 
 
 class Game {
 private:
     sf::RenderWindow m_window;
+    OVTWorld m_world;
 
-    std::vector<OVTRigidBody> m_bodies;
     std::vector<sf::Color> m_colors;
 
     bool m_isMovingLeft = false;
