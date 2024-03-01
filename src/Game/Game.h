@@ -17,8 +17,7 @@ private:
     sf::RenderWindow m_window;
 
     std::vector<OVTRigidBody> m_bodies;
-    std::vector<sf::CircleShape> m_circles;
-    std::vector<sf::RectangleShape> m_rects;
+    std::vector<sf::Color> m_colors;
 
     bool m_isMovingLeft = false;
     bool m_isMovingRight = false;

@@ -99,38 +99,43 @@ void Game::update(float deltaTime) {
             }
 
             if (collision.isCollision) {
-                std::cout << "Collision" << std::endl;
                 bodyA.move(-collision.normal * collision.depth / 2.f);
                 bodyB.move(collision.normal * collision.depth / 2.f);
             }
         }
     }
 
-    int countCircles = 0;
-    int countRects = 0;
-    for (auto &body: m_bodies) {
-//        body.rotate(-M_PI / 2.f * deltaTime);
-        if (body.m_shape == ShapeType::Circle) {
-            m_circles[countCircles].setPosition({body.m_position.x, body.m_position.y});
-            m_circles[countCircles].setRotation(body.m_rotationAngle);
-            countCircles++;
-        } else {
-            m_rects[countRects].setPosition({body.m_position.x, body.m_position.y});
-            m_rects[countRects].setRotation(body.m_rotationAngle);
-            countRects++;
-        }
+    for (auto& body : m_bodies) {
+        body.rotate(M_PI / 2 * deltaTime);
     }
 }
 
 void Game::render() {
     m_window.clear({84, 83, 82});
 
-    for (auto &circle: m_circles) {
-        m_window.draw(circle);
-    }
+    sf::RectangleShape rect;
+    sf::CircleShape circle;
 
-    for (auto &rect: m_rects) {
-        m_window.draw(rect);
+    for (int i = 0; i < m_bodies.size(); i++) {
+        auto& body = m_bodies[i];
+        if (body.m_shape == ShapeType::Circle) {
+            circle.setRadius(body.m_radius);
+            circle.setPosition({body.m_position.x - body.m_radius, body.m_position.y - body.m_radius});
+            circle.setRotation(body.m_rotationAngle * 180 / M_PI); // body has it in radians, SFML needs it in angles
+            circle.setFillColor(m_colors[i]);
+            circle.setOutlineColor(sf::Color::White);
+
+            m_window.draw(circle);
+        } else if (body.m_shape == ShapeType::Square) {
+            rect.setSize({body.m_width, body.m_height});
+            rect.setOrigin({body.m_width / 2, body.m_height / 2});
+            rect.setPosition({body.m_position.x, body.m_position.y});
+            rect.setRotation(body.m_rotationAngle * 180 / M_PI); // body has it in radians, SFML needs it in angles
+            rect.setFillColor(m_colors[i]);
+            rect.setOutlineColor(sf::Color::White);
+
+            m_window.draw(rect);
+        }
     }
 
     m_window.display();
@@ -142,27 +147,23 @@ void Game::init() {
 
 void Game::generateRandomBodies() {
     m_bodies.clear();
-    m_rects.clear();
-    m_circles.clear();
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 20; i++) {
+        if (i == 0) {
+            float width = 55.5f;
+            float height = 50.5f;
+            float x = 0;
+            float y = 0;
+            auto body = OVTRigidBody::createSquareBody(width, height, {x, y}, 5, .4f, false);
+            m_bodies.emplace_back(body);
+        }
+
         bool isCircle = !(std::rand() % 1 == 0);
         if (isCircle) {
             float radius = 15.5f;
             float x = std::clamp<float>(std::rand() % m_window.getSize().x, radius, m_window.getSize().x - radius * 2);
             float y = std::clamp<float>(std::rand() % m_window.getSize().y, radius, m_window.getSize().y - radius * 2);
-            if (x < 0) {
-
-            }
             auto body = OVTRigidBody::createCircleBody(radius, {x, y}, 3, 1, false);
             m_bodies.emplace_back(body);
-
-            sf::CircleShape circle;
-            circle.setRadius(body.m_radius);
-            circle.setPosition({body.m_position.x - body.m_radius, body.m_position.y - body.m_radius});
-            circle.setFillColor(getRandomColor());
-            circle.setOutlineColor(sf::Color::White);
-//            circle.setOutlineThickness(.2f);
-            m_circles.emplace_back(circle);
         } else {
             float width = 55.5f;
             float height = 50.5f;
@@ -170,15 +171,8 @@ void Game::generateRandomBodies() {
             float y = std::clamp<float>(std::rand() % m_window.getSize().y, height / 2, m_window.getSize().y - height);
             auto body = OVTRigidBody::createSquareBody(width, height, {x, y}, 5, .4f, false);
             m_bodies.emplace_back(body);
-
-            sf::RectangleShape rect;
-            rect.setSize({body.m_width, body.m_height});
-            rect.setPosition({body.m_position.x - body.m_width / 2, body.m_position.y - body.m_height / 2});
-            rect.setFillColor(getRandomColor());
-            rect.setOutlineColor(sf::Color::White);
-//            rect.setOutlineThickness(.2f);
-            m_rects.emplace_back(rect);
         }
+        m_colors.emplace_back(getRandomColor());
     }
 }
 

@@ -31,7 +31,7 @@ OVTVector OVTMath::transform(const OVTVector &vec, const OVTTransform &transform
 
     // Rotate first, then translate
     transformed.x = vec.x * transform.m_cos - vec.y * transform.m_sin;
-    transformed.y = vec.x * transform.m_sin - vec.y * transform.m_cos;
+    transformed.y = vec.x * transform.m_sin + vec.y * transform.m_cos;
 
     transformed.x += transform.m_x;
     transformed.y += transform.m_y;
