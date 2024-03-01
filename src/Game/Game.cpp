@@ -94,13 +94,27 @@ void Game::update(float deltaTime) {
 
             if (bodyA.m_shape == ShapeType::Circle && bodyB.m_shape == ShapeType::Circle) {
                 collision = OVTCollisions::intersectCircle(bodyA.m_position, bodyA.m_radius, bodyB.m_position, bodyB.m_radius);
-            } else {
-                collision = OVTCollisions::intersectPolygons(bodyA.getTransformedVertices(), bodyB.getTransformedVertices());
-            }
 
-            if (collision.isCollision) {
-                bodyA.move(-collision.normal * collision.depth / 2.f);
-                bodyB.move(collision.normal * collision.depth / 2.f);
+                if (collision.isCollision) {
+                    bodyA.move(-collision.normal * collision.depth / 2.f);
+                    bodyB.move(collision.normal * collision.depth / 2.f);
+                }
+            } else if (bodyA.m_shape == ShapeType::Square && bodyB.m_shape == ShapeType::Square) {
+                collision = OVTCollisions::intersectPolygons(bodyA.getTransformedVertices(), bodyB.getTransformedVertices());
+
+                if (collision.isCollision) {
+                    bodyA.move(-collision.normal * collision.depth / 2.f);
+                    bodyB.move(collision.normal * collision.depth / 2.f);
+                }
+            } else {
+                auto& circle = bodyA.m_shape == ShapeType::Circle ? bodyA : bodyB;
+                auto& square = bodyA.m_shape == ShapeType::Square ? bodyA : bodyB;
+                collision = OVTCollisions::intersectCirclePolygon(circle.m_position, circle.m_radius, square.getTransformedVertices());
+
+                if (collision.isCollision) {
+                    circle.move(-collision.normal * collision.depth / 2.f);
+                    square.move(collision.normal * collision.depth / 2.f);
+                }
             }
         }
     }
@@ -120,7 +134,8 @@ void Game::render() {
         auto& body = m_bodies[i];
         if (body.m_shape == ShapeType::Circle) {
             circle.setRadius(body.m_radius);
-            circle.setPosition({body.m_position.x - body.m_radius, body.m_position.y - body.m_radius});
+            circle.setOrigin({body.m_radius, body.m_radius});
+            circle.setPosition({body.m_position.x, body.m_position.y});
             circle.setRotation(body.m_rotationAngle * 180 / M_PI); // body has it in radians, SFML needs it in angles
             circle.setFillColor(m_colors[i]);
             circle.setOutlineColor(sf::Color::White);
@@ -148,16 +163,7 @@ void Game::init() {
 void Game::generateRandomBodies() {
     m_bodies.clear();
     for (int i = 0; i < 20; i++) {
-        if (i == 0) {
-            float width = 55.5f;
-            float height = 50.5f;
-            float x = 0;
-            float y = 0;
-            auto body = OVTRigidBody::createSquareBody(width, height, {x, y}, 5, .4f, false);
-            m_bodies.emplace_back(body);
-        }
-
-        bool isCircle = !(std::rand() % 1 == 0);
+        bool isCircle = !(std::rand() % 2 == 0);
         if (isCircle) {
             float radius = 15.5f;
             float x = std::clamp<float>(std::rand() % m_window.getSize().x, radius, m_window.getSize().x - radius * 2);
